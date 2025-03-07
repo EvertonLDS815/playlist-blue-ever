@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player de Música</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <section id="player">
+        <h1>Playlist Blue</h1>
+        <div id="imon">
+            <img id="currentImg" src="/imgs/musicoff.jpg" alt="Capa da música">
+            <h2 id="musicTitle">Título</h2>
+            <h2 id="musicArtist">Artista</h2>
+        </div>
+        <div>
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Nome</th>
+                        <th>Artista</th>
+                    </tr>
+                </thead>
+                <tbody id="playlistTable">
+                </tbody>
+            </table>
+        </div>
+    </section>
+    <section id="controls">
+        <i id="prev-control" class="bi bi-skip-start-fill"></i>
+        <i id="play-control" class="bi bi-play-fill"></i>
+        <i id="next-control" class="bi bi-skip-end-fill"></i>
+        
+        <span id="current-duration">00:00</span>
+        <input id="progressbar" type="range" min="0" max="0" step="1">
+        <span id="total-duration">00:00</span>
+        
+        <i id="mute-control" class="bi bi-volume-up-fill"></i>
+        <input id="volume" type="range" min="0" max="100" step="1">
+    </section>
+    <script>
+        const audio = new Audio();
+        const title = document.getElementById("musicTitle");
+        const artist = document.getElementById("musicArtist");
+        const cover = document.getElementById("currentImg");
+        const playlistTable = document.getElementById("playlistTable");
+        const muteButton = document.getElementById("mute-control");
+        const btnPlay = document.querySelector("#play-control");
+        const currentDuration = document.getElementById("current-duration");
+        const totalDuration = document.getElementById("total-duration");
+        const volumeControl = document.getElementById("volume");
+        let index = 0;
+        
+        const playlist = [
+            {
+                name: "You Say Run",
+                author: "Boku no Hero",
+                linkMusic: "https://playlist-el.netlify.app/audios/you-say-run.mpeg",
+                linkImage: "https://www.latercera.com/resizer/K_nHtagMhTTMTQaO1QuwwLfPsXI=/900x600/smart/arc-anglerfish-arc2-prod-copesa.s3.amazonaws.com/public/C22TFYFMG5G45NBTWGSQT3HBWM.jpg"
+            },
+            {
+                name: "Top Gear",
+                author: "Super Nintendo",
+                linkMusic: "https://playlist-el.netlify.app/audios/top-gear-2.mpeg",
+                linkImage: "https://i.pinimg.com/736x/33/06/79/3306790afdd1f98011449bb78f650e0e.jpg"
+            },
+            {
+                name: "Top Gear 4",
+                author: "Super Nintendo",
+                linkMusic: "https://playlist-el.netlify.app/audios/top-gear-4.mp3",
+                linkImage: "https://i.pinimg.com/736x/33/06/79/3306790afdd1f98011449bb78f650e0e.jpg"
+            },
+            {
+                name: "Haruka Kanata",
+                author: "Naruto",
+                linkMusic: "https://playlist-el.netlify.app/audios/haruka-kanata.mp3",
+                linkImage: "https://i.pinimg.com/736x/8b/21/fc/8b21fca9e657ac48810d7b2a403f1029.jpg"
+            },
+            {
+                name: "Toumei Datta Sekai",
+                author: "Naruto",
+                linkMusic: "https://playlist-el.netlify.app/audios/toumei-datta-sekai.mp3",
+                linkImage: "https://i.pinimg.com/736x/b5/4a/76/b54a76c391f413956dc9549aba9c23ee.jpg"
+            }
+        ];
+        let currentTrack = 0;
+        let firstPlay = true;
+
+        function formatTime(seconds) {
+            const min = Math.floor(seconds / 60);
+            const sec = Math.floor(seconds % 60);
+            return `${("0" + min).slice(-2)}:${("0" + sec).slice(-2)}`;
+        }
+
+        
+        const progressbar = document.querySelector("#progressbar");
+        
+        
+        function updateTime() {
+            currentDuration.textContent = formatTime(audio.currentTime);
+            progressbar.valueAsNumber = audio.currentTime;
+            progressbar.max = audio.duration;
+        }
+
+        function loadPlaylist() {
+            playlistTable.innerHTML = "";
+            playlist.forEach((music, index) => {
+                const row = document.createElement("tr");
+                row.classList.add("li-changed");
+                row.innerHTML = `
+                    <td><img src="${music.linkImage}" alt="Imagem da música"></td>
+                    <td>${music.name}</td>
+                    <td>${music.author}</td>
+                `;
+                row.addEventListener("click", () => playTrack(index));
+                playlistTable.appendChild(row);
+            });
+        }
+
+        function playTrack(index) {
+            currentTrack = index;
+            audio.src = playlist[currentTrack].linkMusic;
+            title.textContent = playlist[currentTrack].name;
+            artist.textContent = playlist[currentTrack].author;
+            cover.src = playlist[currentTrack].linkImage;
+            audio.play();
+            btnPlay.classList.replace("bi-play-fill", "bi-pause-fill");
+            firstPlay = false;
+
+            const lichanged = document.querySelectorAll(".li-changed");
+
+// Remove a classe 'active' de todas as músicas
+            lichanged.forEach(item => item.classList.remove("active"));
+
+            // Adiciona a classe 'active' na música atual
+            lichanged[index].classList.add("active");
+            
+            audio.onloadedmetadata = () => {
+                totalDuration.textContent = formatTime(audio.duration);
+            };
+        }
+
+        const progressBar = document.getElementById("progressbar");
+
+// Atualiza a barra de progresso conforme a música toca
+audio.addEventListener("timeupdate", () => {
+    progressBar.value = audio.currentTime;
+    document.getElementById("current-duration").textContent = formatTime(audio.currentTime);
+});
+
+// Atualiza a duração total da música quando ela carregar
+audio.addEventListener("loadedmetadata", () => {
+    progressBar.max = audio.duration;
+    document.getElementById("total-duration").textContent = formatTime(audio.duration);
+});
+
+// Permite que o usuário clique na barra para avançar ou retroceder a música
+progressBar.addEventListener("input", () => {
+    audio.currentTime = progressBar.value;
+});
+
+// Função para formatar o tempo (exemplo: 01:30)
+function formatTime(seconds) {
+    const min = Math.floor(seconds / 60);
+    const sec = Math.floor(seconds % 60);
+    return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+}
+
+    muteButton.addEventListener("click", () => {
+        audio.muted = !audio.muted;
+
+        // Troca o ícone conforme o estado do áudio (mudo ou com som)
+        if (audio.muted) {
+            muteButton.classList.replace("bi-volume-up-fill", "bi-volume-mute-fill");
+        } else {
+            muteButton.classList.replace("bi-volume-mute-fill", "bi-volume-up-fill");
+        }
+    });
+
+    audio.addEventListener("ended", () => {
+        currentTrack = (currentTrack + 1) % playlist.length; // Avança para a próxima música
+        playTrack(currentTrack); // Reproduz a nova música
+    });
+
+
+        audio.ontimeupdate = updateTime;
+
+        volumeControl.addEventListener("input", () => {
+            audio.volume = volumeControl.value / 100;
+        });
+
+        btnPlay.addEventListener("click", () => {
+            if (firstPlay) {
+                playTrack(0);
+            } else if (audio.paused) {
+                audio.play();
+                btnPlay.classList.replace("bi-play-fill", "bi-pause-fill");
+            } else {
+                audio.pause();
+                btnPlay.classList.replace("bi-pause-fill", "bi-play-fill");
+            }
+        });
+
+        document.getElementById("next-control").addEventListener("click", () => {
+            currentTrack = (currentTrack + 1) % playlist.length;
+            playTrack(currentTrack);
+        });
+
+        document.getElementById("prev-control").addEventListener("click", () => {
+            currentTrack = (currentTrack - 1 + playlist.length) % playlist.length;
+            playTrack(currentTrack);
+        });
+
+        loadPlaylist();
+    </script>
+</body>
+</html>

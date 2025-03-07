@@ -1,0 +1,335 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;1,100&display=swap');
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+}
+body {
+    background-color: #000;
+    color: #fff;
+}
+#currentImg {
+    width: 350px;
+    height: 225px;
+    border: 2px solid #aaa;
+}
+#player {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    padding-bottom: 6rem;
+}
+#imon {
+    width: 390px;
+}
+#player h1 {
+    width: 100%;
+    text-align: center;
+    padding: 2rem 0 5rem 0;
+    font-size: 3rem;
+    font-weight: 300;
+}
+#player div {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+#player div h2#currentName {
+    width: 100%;
+    text-align: center;
+    padding: 1rem 0 0.5rem 0;
+    font-weight: 400;
+    font-size: 2rem;
+}
+#player table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 46rem;
+}
+#player table th, td {
+    padding: 1rem;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+#player table td img {
+    width: 4rem;
+}
+.li-changed:hover,
+.li-changed.active {
+    background-color: #1c1c1c !important;
+}
+section#add {
+    padding: 3rem;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+section#add h2 {
+    width: 100%;
+    padding: 0 0 5rem 0;
+    font-size: 3rem;
+    font-weight: 100;
+    text-align: center;
+}
+form {
+    display: flex;
+    flex-wrap: wrap;
+    width: 50%;
+}
+form input {
+    width: 100%;
+    padding: 0.5rem;
+    margin: 0.3rem 1rem 1rem 1rem;
+    font-size: 1.5rem;
+    border: 1px solid #0071a5;
+    outline: none;
+}
+form label {
+    margin: 0rem 1rem 0rem 1rem;
+    font-size: 1.2rem;
+    color: white;
+}
+form button {
+    border: 2px solid #00a53f;
+    padding: .6rem;
+    font-size: 1.2rem;
+    font-weight: 800;
+    display: flex;
+    justify-content: center;
+    margin: 0 1rem;
+    background: transparent;
+    color: #00a53f;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+form button:hover {
+    background: #00a53f;
+    color: white;
+}
+section#player h2 {
+    width: 100%;
+    padding: 1rem 0 0 0;
+    font-size: 2.3rem;
+    text-align: center;
+}
+#musicTitle {
+    font-weight: 400;
+}
+#musicArtist {
+    font-weight: 100;
+}
+td#actions a {
+    text-decoration: none;
+    color: #fff;
+    border: 1px solid #fff;
+    padding: 0.5rem;
+    border-radius: 5px;
+    transition: all 0.2s ease-in-out;
+}
+a#edit {
+    margin-right: 1rem;
+}
+a#edit:hover {
+    background: #0044ff;
+    border: 1px solid #0044ff;
+}
+a#delete:hover {
+    background: #ff0000;
+    border: 1px solid #ff0000;
+}
+section#controls {
+    background: #232327;
+    padding: 1rem 0;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+section#controls i {
+    font-size: 2.3rem;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+section#controls i:hover {
+    background: #d32c2c10;
+    border-radius: 4rem;
+}
+section#controls input#progressbar {
+    width: 60%;
+    margin: 0 10px;
+}
+#mute-control {
+    margin: 0 10px;
+}
+section#controls i#vol-icon {
+    font-size: 2rem;
+    padding: 1rem;
+}
+section#controls input#volume {
+    width: 10%;
+}
+
+
+@media (max-width: 985px) {
+    #player h1 {
+        padding: 2rem 0 3rem 0;
+        font-size: 2.5rem;
+    }
+    section#controls input#progressbar {
+        width: 50%;
+    }
+    section#controls span {
+        padding: 0.5rem;
+    }
+}
+@media (max-width: 790px) {
+    #currentImg {
+        width: 290px;
+        height: 180px;
+    }
+    section#add h2 {
+        font-size: 2.5rem;
+    }
+    form#create-form {
+        width: 340px;
+    }
+    form#create-form label {
+        margin: 0;
+    }
+    form#create-form input {
+        margin: 0.3rem 0 1rem;
+    }
+    form#create-form button {
+        margin: 0;
+        width: 100%;
+    }
+    #player table {
+        width: 90vw;
+    }
+    .dis-no {
+        display: none;
+    }
+    section#controls input#progressbar {
+        width: 40%;
+    }
+    section#modal div#card {
+        width: 316px;
+    }
+    section#modal div#card p {
+        padding: 2rem 10px;
+    }
+}
+@media (max-width: 650px) {
+    #player h1 {
+        padding: 2rem 0 2rem 0;
+    }
+    #player div h2#currentName {
+        font-size: 1.6rem;
+    }
+    #player table th, td {
+        padding: 1rem 0.4rem;
+    }
+    section#player h2 {
+        font-size: 2rem;
+        padding-bottom: 2rem;
+        line-height: 29px;
+    }
+    form#form-modal {
+        padding: 1rem 0;
+    }
+    a#edit {
+        margin-right: 0.4rem;
+    }
+    section#controls i {
+        font-size: 2.5rem;
+    }
+    section#controls i#vol-icon {
+        font-size: 2rem;
+        padding: 0.5rem;
+    }
+}
+@media (max-width: 550px) {
+    #player table th, td {
+        padding: 1rem 5px;
+        font-size: 15px;
+    }
+    section#controls input#volume {
+        display: none;
+    }
+    form input {
+        font-size: 1.3rem;
+    }
+    form#form-modal input {
+        padding: 0.3rem;
+    }
+    a#edit {
+        margin-right: 0;
+    }
+}
+@media (max-width: 510px) {
+    nav ul li img {
+        width: 25%;
+    }
+    section#add h2 {
+        font-size: 2rem;
+        padding: 0 0 2rem 0;
+    }
+    #player {
+        padding-bottom: 5rem;
+    }
+    #player table td img {
+        width: 3.5rem;
+    }
+    section#player h2 {
+        font-size: 1.7rem;
+    }
+    #actions {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+    }
+    #player table th, td {
+        text-align: center;
+    }
+    td#actions a {
+        font-size: 15px;
+    }
+    a#edit {
+        display: block;
+        margin-bottom: 19px;
+    }
+    section#controls {
+        padding: 0.7rem 0;
+    }
+    section#controls i {
+        font-size: 2rem;
+    }
+    section#controls span {
+        font-size: 15px;
+    }
+    section#controls i#vol-icon {
+        font-size: 1.5rem;
+    }
+}
+@media (max-width: 400px) {
+    #player div {
+        width: 90vw;
+    }
+    section#add {
+        padding: 2rem;
+    }
+    form {
+        width: 300px;
+    }
+    section#modal div#card {
+        width: 90%;
+    }
+    section#modal div#card h2 {
+        padding: 2rem 1.5rem;
+    }
+}
