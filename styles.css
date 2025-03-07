@@ -120,11 +120,11 @@ section#controls i {
     transition: all 0.3s ease-in-out;
 }
 section#controls i:hover {
-    background: #d32c2c10;
+    background: #ffffff10;
     border-radius: 4rem;
 }
 section#controls input#progressbar {
-    width: 60%;
+    width: 100%;
     margin: 0 10px;
 }
 #mute-control {
@@ -266,6 +266,13 @@ section#controls input#volume {
     a#edit {
         display: block;
         margin-bottom: 19px;
+    }
+    .li-changed:hover,
+    .li-changed.active {
+    background-color: transparent !important;
+}
+    .li-changed.active {
+        background-color: #1c1c1c !important;
     }
     section#controls {
         padding: 0.7rem 0;
