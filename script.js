@@ -1,5 +1,3 @@
-let audioContext;
-let gainNode;
 const audio = new Audio();
 const title = document.getElementById("musicTitle");
 const artist = document.getElementById("musicArtist");
@@ -14,17 +12,6 @@ const progressBar = document.getElementById("progressbar");
 
 let currentTrack = 0;
 let firstPlay = true;
-
-// Função para iniciar o AudioContext SOMENTE após um clique do usuário
-function initAudioContext() {
-    if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const source = audioContext.createMediaElementSource(audio);
-        gainNode = audioContext.createGain();
-        source.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-    }
-}
 
 // Lista de músicas
 const playlist = [
@@ -132,14 +119,12 @@ const playlist = [
     }
 ];
 
-// Formata tempo em MM:SS
 function formatTime(seconds) {
     const min = Math.floor(seconds / 60);
     const sec = Math.floor(seconds % 60);
     return `${("0" + min).slice(-2)}:${("0" + sec).slice(-2)}`;
 }
 
-// Carrega a playlist na tela
 function loadPlaylist() {
     playlistTable.innerHTML = "";
     playlist.forEach((music, index) => {
@@ -155,16 +140,13 @@ function loadPlaylist() {
     });
 }
 
-// Atualiza o progresso da música
 function updateProgress() {
     currentDuration.textContent = formatTime(audio.currentTime);
     progressBar.value = audio.currentTime;
     progressBar.max = audio.duration;
 }
 
-// Reproduz uma música
 function playTrack(index) {
-    initAudioContext(); // Garante que o AudioContext foi iniciado
     currentTrack = index;
     audio.src = playlist[currentTrack].linkMusic;
     title.textContent = playlist[currentTrack].name;
@@ -174,6 +156,7 @@ function playTrack(index) {
     btnPlay.classList.replace("bi-play-fill", "bi-pause-fill");
     firstPlay = false;
 
+    // Atualiza a lista de reprodução visualmente
     document.querySelectorAll(".li-changed").forEach((item) => item.classList.remove("active"));
     document.querySelectorAll(".li-changed")[index].classList.add("active");
 
@@ -183,7 +166,7 @@ function playTrack(index) {
     };
 }
 
-// Atualiza a Media Session API
+// Atualiza a Media Session API para exibir a música na notificação do celular
 function updateMediaSession() {
     if ('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
@@ -199,9 +182,7 @@ function updateMediaSession() {
     }
 }
 
-// Play/Pause
 function playPause() {
-    initAudioContext(); // Garante que o AudioContext foi iniciado
     if (firstPlay) {
         playTrack(0);
     } else if (audio.paused) {
@@ -213,40 +194,34 @@ function playPause() {
     }
 }
 
-// Próxima música
 function nextTrack() {
     currentTrack = (currentTrack + 1) % playlist.length;
     playTrack(currentTrack);
 }
 
-// Música anterior
 function prevTrack() {
     currentTrack = (currentTrack - 1 + playlist.length) % playlist.length;
     playTrack(currentTrack);
 }
 
-// Atualiza progresso da música
+// Atualiza a barra de progresso conforme a música toca
 audio.addEventListener("timeupdate", updateProgress);
 
-// Clicar na barra de progresso para avançar ou retroceder
+// Permite clicar na barra para avançar ou retroceder a música
 progressBar.addEventListener("input", () => {
     audio.currentTime = progressBar.value;
 });
 
-// Botão de mute
+// Mute e Unmute
 muteButton.addEventListener("click", () => {
-    if (gainNode.gain.value > 0) {
-        gainNode.gain.value = 0;
-        muteButton.classList.replace("bi-volume-up-fill", "bi-volume-mute-fill");
-    } else {
-        gainNode.gain.value = volumeControl.value / 100;
-        muteButton.classList.replace("bi-volume-mute-fill", "bi-volume-up-fill");
-    }
+    audio.muted = !audio.muted;
+    muteButton.classList.toggle("bi-volume-mute-fill", audio.muted);
+    muteButton.classList.toggle("bi-volume-up-fill", !audio.muted);
 });
 
-// Controle de volume
+// Volume
 volumeControl.addEventListener("input", () => {
-    gainNode.gain.value = volumeControl.value / 100;
+    audio.volume = volumeControl.value / 100;
 });
 
 // Controles de botões
@@ -269,5 +244,4 @@ document.addEventListener("keydown", (e) => {
 // Quando a música terminar, toca a próxima
 audio.addEventListener("ended", nextTrack);
 
-// Carrega a playlist ao iniciar
 loadPlaylist();
