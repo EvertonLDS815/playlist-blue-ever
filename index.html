@@ -52,7 +52,9 @@
         const currentDuration = document.getElementById("current-duration");
         const totalDuration = document.getElementById("total-duration");
         const volumeControl = document.getElementById("volume");
-        let index = 0;
+        const progressBar = document.getElementById("progressbar");
+        let currentTrack = 0;
+        let firstPlay = true;
         
         const playlist = [
             {
@@ -158,135 +160,121 @@
                 linkImage: "imgs/guitar-hero-god.jpg"
             }
         ];
-        let currentTrack = 0;
-        let firstPlay = true;
-
         function formatTime(seconds) {
-            const min = Math.floor(seconds / 60);
-            const sec = Math.floor(seconds % 60);
-            return `${("0" + min).slice(-2)}:${("0" + sec).slice(-2)}`;
-        }
+    const min = Math.floor(seconds / 60);
+    const sec = Math.floor(seconds % 60);
+    return `${("0" + min).slice(-2)}:${("0" + sec).slice(-2)}`;
+}
 
-        
-        const progressbar = document.querySelector("#progressbar");
-        
-        
-        function updateTime() {
-            currentDuration.textContent = formatTime(audio.currentTime);
-            progressbar.valueAsNumber = audio.currentTime;
-            progressbar.max = audio.duration;
-        }
+function loadPlaylist() {
+    playlistTable.innerHTML = "";
+    playlist.forEach((music, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td><img src="${music.linkImage}" alt="Imagem da música"></td>
+            <td>${music.name}</td>
+            <td>${music.author}</td>
+        `;
+        row.addEventListener("click", () => playTrack(index));
+        playlistTable.appendChild(row);
+    });
+}
 
-        function loadPlaylist() {
-            playlistTable.innerHTML = "";
-            playlist.forEach((music, index) => {
-                const row = document.createElement("tr");
-                row.classList.add("li-changed");
-                row.innerHTML = `
-                    <td><img src="${music.linkImage}" alt="Imagem da música"></td>
-                    <td>${music.name}</td>
-                    <td>${music.author}</td>
-                `;
-                row.addEventListener("click", () => playTrack(index));
-                playlistTable.appendChild(row);
-            });
-        }
+function playTrack(index) {
+    currentTrack = index;
+    audio.src = playlist[currentTrack].linkMusic;
+    title.textContent = playlist[currentTrack].name;
+    artist.textContent = playlist[currentTrack].author;
+    cover.src = playlist[currentTrack].linkImage;
+    audio.play();
+    btnPlay.classList.replace("bi-play-fill", "bi-pause-fill");
+    firstPlay = false;
+    updateMediaSession();
+    
+    audio.onloadedmetadata = () => {
+        totalDuration.textContent = formatTime(audio.duration);
+    };
+}
 
-        function playTrack(index) {
-            currentTrack = index;
-            audio.src = playlist[currentTrack].linkMusic;
-            title.textContent = playlist[currentTrack].name;
-            artist.textContent = playlist[currentTrack].author;
-            cover.src = playlist[currentTrack].linkImage;
+function updateMediaSession() {
+    if ("mediaSession" in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title: playlist[currentTrack].name,
+            artist: playlist[currentTrack].author,
+            artwork: [
+                { src: playlist[currentTrack].linkImage, sizes: "512x512", type: "image/png" }
+            ]
+        });
+        
+        navigator.mediaSession.setActionHandler("play", () => {
             audio.play();
             btnPlay.classList.replace("bi-play-fill", "bi-pause-fill");
-            firstPlay = false;
+        });
+        
+        navigator.mediaSession.setActionHandler("pause", () => {
+            audio.pause();
+            btnPlay.classList.replace("bi-pause-fill", "bi-play-fill");
+        });
+        
+        navigator.mediaSession.setActionHandler("nexttrack", () => {
+            currentTrack = (currentTrack + 1) % playlist.length;
+            playTrack(currentTrack);
+        });
+        
+        navigator.mediaSession.setActionHandler("previoustrack", () => {
+            currentTrack = (currentTrack - 1 + playlist.length) % playlist.length;
+            playTrack(currentTrack);
+        });
+    }
+}
 
-            const lichanged = document.querySelectorAll(".li-changed");
-
-// Remove a classe 'active' de todas as músicas
-            lichanged.forEach(item => item.classList.remove("active"));
-
-            // Adiciona a classe 'active' na música atual
-            lichanged[index].classList.add("active");
-            
-            audio.onloadedmetadata = () => {
-                totalDuration.textContent = formatTime(audio.duration);
-            };
-        }
-
-        const progressBar = document.getElementById("progressbar");
-
-// Atualiza a barra de progresso conforme a música toca
 audio.addEventListener("timeupdate", () => {
     progressBar.value = audio.currentTime;
-    document.getElementById("current-duration").textContent = formatTime(audio.currentTime);
+    currentDuration.textContent = formatTime(audio.currentTime);
 });
 
-// Atualiza a duração total da música quando ela carregar
-audio.addEventListener("loadedmetadata", () => {
-    progressBar.max = audio.duration;
-    document.getElementById("total-duration").textContent = formatTime(audio.duration);
-});
-
-// Permite que o usuário clique na barra para avançar ou retroceder a música
 progressBar.addEventListener("input", () => {
     audio.currentTime = progressBar.value;
 });
 
-// Função para formatar o tempo (exemplo: 01:30)
-function formatTime(seconds) {
-    const min = Math.floor(seconds / 60);
-    const sec = Math.floor(seconds % 60);
-    return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
-}
+audio.addEventListener("ended", () => {
+    currentTrack = (currentTrack + 1) % playlist.length;
+    playTrack(currentTrack);
+});
 
-    muteButton.addEventListener("click", () => {
-        audio.muted = !audio.muted;
+muteButton.addEventListener("click", () => {
+    audio.muted = !audio.muted;
+    muteButton.classList.toggle("bi-volume-mute-fill");
+    muteButton.classList.toggle("bi-volume-up-fill");
+});
 
-        // Troca o ícone conforme o estado do áudio (mudo ou com som)
-        if (audio.muted) {
-            muteButton.classList.replace("bi-volume-up-fill", "bi-volume-mute-fill");
-        } else {
-            muteButton.classList.replace("bi-volume-mute-fill", "bi-volume-up-fill");
-        }
-    });
+volumeControl.addEventListener("input", () => {
+    audio.volume = volumeControl.value / 100;
+});
 
-    audio.addEventListener("ended", () => {
-        currentTrack = (currentTrack + 1) % playlist.length; // Avança para a próxima música
-        playTrack(currentTrack); // Reproduz a nova música
-    });
+btnPlay.addEventListener("click", () => {
+    if (firstPlay) {
+        playTrack(0);
+    } else if (audio.paused) {
+        audio.play();
+        btnPlay.classList.replace("bi-play-fill", "bi-pause-fill");
+    } else {
+        audio.pause();
+        btnPlay.classList.replace("bi-pause-fill", "bi-play-fill");
+    }
+});
 
+document.getElementById("next-control").addEventListener("click", () => {
+    currentTrack = (currentTrack + 1) % playlist.length;
+    playTrack(currentTrack);
+});
 
-        audio.ontimeupdate = updateTime;
+document.getElementById("prev-control").addEventListener("click", () => {
+    currentTrack = (currentTrack - 1 + playlist.length) % playlist.length;
+    playTrack(currentTrack);
+});
 
-        volumeControl.addEventListener("input", () => {
-            audio.volume = volumeControl.value / 100;
-        });
-
-        btnPlay.addEventListener("click", () => {
-            if (firstPlay) {
-                playTrack(0);
-            } else if (audio.paused) {
-                audio.play();
-                btnPlay.classList.replace("bi-play-fill", "bi-pause-fill");
-            } else {
-                audio.pause();
-                btnPlay.classList.replace("bi-pause-fill", "bi-play-fill");
-            }
-        });
-
-        document.getElementById("next-control").addEventListener("click", () => {
-            currentTrack = (currentTrack + 1) % playlist.length;
-            playTrack(currentTrack);
-        });
-
-        document.getElementById("prev-control").addEventListener("click", () => {
-            currentTrack = (currentTrack - 1 + playlist.length) % playlist.length;
-            playTrack(currentTrack);
-        });
-
-        loadPlaylist();
+loadPlaylist();
     </script>
 </body>
 </html>
