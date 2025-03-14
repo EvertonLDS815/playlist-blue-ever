@@ -1,10 +1,6 @@
-const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+let audioContext;
+let gainNode;
 const audio = new Audio();
-const source = audioContext.createMediaElementSource(audio);
-const gainNode = audioContext.createGain();
-source.connect(gainNode);
-gainNode.connect(audioContext.destination);
-
 const title = document.getElementById("musicTitle");
 const artist = document.getElementById("musicArtist");
 const cover = document.getElementById("currentImg");
@@ -19,7 +15,18 @@ const progressBar = document.getElementById("progressbar");
 let currentTrack = 0;
 let firstPlay = true;
 
-// Define a playlist
+// Função para iniciar o AudioContext SOMENTE após um clique do usuário
+function initAudioContext() {
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const source = audioContext.createMediaElementSource(audio);
+        gainNode = audioContext.createGain();
+        source.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+    }
+}
+
+// Lista de músicas
 const playlist = [
     {
         name: "You Say Run",
@@ -132,7 +139,7 @@ function formatTime(seconds) {
     return `${("0" + min).slice(-2)}:${("0" + sec).slice(-2)}`;
 }
 
-// Carrega a lista de músicas na tabela
+// Carrega a playlist na tela
 function loadPlaylist() {
     playlistTable.innerHTML = "";
     playlist.forEach((music, index) => {
@@ -148,15 +155,16 @@ function loadPlaylist() {
     });
 }
 
-// Atualiza a barra de progresso e o tempo
+// Atualiza o progresso da música
 function updateProgress() {
     currentDuration.textContent = formatTime(audio.currentTime);
     progressBar.value = audio.currentTime;
     progressBar.max = audio.duration;
 }
 
-// Reproduz a faixa selecionada
+// Reproduz uma música
 function playTrack(index) {
+    initAudioContext(); // Garante que o AudioContext foi iniciado
     currentTrack = index;
     audio.src = playlist[currentTrack].linkMusic;
     title.textContent = playlist[currentTrack].name;
@@ -166,7 +174,6 @@ function playTrack(index) {
     btnPlay.classList.replace("bi-play-fill", "bi-pause-fill");
     firstPlay = false;
 
-    // Atualiza visualmente a playlist
     document.querySelectorAll(".li-changed").forEach((item) => item.classList.remove("active"));
     document.querySelectorAll(".li-changed")[index].classList.add("active");
 
@@ -176,7 +183,7 @@ function playTrack(index) {
     };
 }
 
-// Atualiza a Media Session API para mostrar a música na notificação do celular
+// Atualiza a Media Session API
 function updateMediaSession() {
     if ('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
@@ -192,8 +199,9 @@ function updateMediaSession() {
     }
 }
 
-// Toca ou pausa a música
+// Play/Pause
 function playPause() {
+    initAudioContext(); // Garante que o AudioContext foi iniciado
     if (firstPlay) {
         playTrack(0);
     } else if (audio.paused) {
@@ -205,27 +213,27 @@ function playPause() {
     }
 }
 
-// Avança para a próxima faixa
+// Próxima música
 function nextTrack() {
     currentTrack = (currentTrack + 1) % playlist.length;
     playTrack(currentTrack);
 }
 
-// Volta para a faixa anterior
+// Música anterior
 function prevTrack() {
     currentTrack = (currentTrack - 1 + playlist.length) % playlist.length;
     playTrack(currentTrack);
 }
 
-// Atualiza a barra de progresso conforme a música toca
+// Atualiza progresso da música
 audio.addEventListener("timeupdate", updateProgress);
 
-// Permite clicar na barra para avançar ou retroceder a música
+// Clicar na barra de progresso para avançar ou retroceder
 progressBar.addEventListener("input", () => {
     audio.currentTime = progressBar.value;
 });
 
-// Mute e Unmute usando GainNode
+// Botão de mute
 muteButton.addEventListener("click", () => {
     if (gainNode.gain.value > 0) {
         gainNode.gain.value = 0;
@@ -236,7 +244,7 @@ muteButton.addEventListener("click", () => {
     }
 });
 
-// Controle de volume usando GainNode
+// Controle de volume
 volumeControl.addEventListener("input", () => {
     gainNode.gain.value = volumeControl.value / 100;
 });
