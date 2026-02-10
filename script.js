@@ -10,6 +10,9 @@ const totalDuration = document.getElementById("total-duration");
 const volumeControl = document.getElementById("volume");
 const progressBar = document.getElementById("progressbar");
 
+audio.style.display = "none";
+document.body.appendChild(audio);
+
 let currentTrack = 0;
 let firstPlay = true;
 
