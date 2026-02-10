@@ -10,18 +10,6 @@ const totalDuration = document.getElementById("total-duration");
 const volumeControl = document.getElementById("volume");
 const progressBar = document.getElementById("progressbar");
 
-audio.crossOrigin = "anonymous"; // Evita bloqueios de CORS ao processar o áudio
-
-// Criar o contexto de áudio (essencial para extensões de Booster)
-const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-const source = audioContext.createMediaElementSource(audio);
-
-// Ligar o áudio ao destino final (as tuas colunas)
-// É aqui que a extensão de booster consegue "entrar" no meio do caminho
-source.connect(audioContext.destination);
-// ... resto das tuas variáveis (title, artist, etc)
-
-
 let currentTrack = 0;
 let firstPlay = true;
 
