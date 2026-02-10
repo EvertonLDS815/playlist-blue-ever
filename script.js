@@ -231,12 +231,28 @@ document.getElementById("prev-control").addEventListener("click", prevTrack);
 
 // Teclas de atalho: Espaço (play/pause), Setas (próxima/anterior)
 document.addEventListener("keydown", (e) => {
-    if (e.code === "Space") {
+    // Atalho: Ctrl + M (Mute/Unmute)
+    if (e.ctrlKey && e.key.toLowerCase() === "m") {
+        e.preventDefault();
+        audio.muted = !audio.muted;
+        
+        // Atualiza o ícone do botão visualmente
+        if (muteButton) {
+            muteButton.classList.toggle("bi-volume-mute-fill", audio.muted);
+            muteButton.classList.toggle("bi-volume-up-fill", !audio.muted);
+        }
+    } 
+    // Atalho: Espaço (Play/Pause)
+    else if (e.code === "Space") {
         e.preventDefault();
         playPause();
-    } else if (e.code === "ArrowRight") {
+    } 
+    // Atalho: Seta Direita ou Ctrl + Seta Direita (Próxima)
+    else if (e.code === "ArrowRight") {
         nextTrack();
-    } else if (e.code === "ArrowLeft") {
+    } 
+    // Atalho: Seta Esquerda ou Ctrl + Seta Esquerda (Anterior)
+    else if (e.code === "ArrowLeft") {
         prevTrack();
     }
 });
